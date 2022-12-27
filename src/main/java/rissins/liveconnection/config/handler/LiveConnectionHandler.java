@@ -10,12 +10,16 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 @Slf4j
 public class LiveConnectionHandler extends TextWebSocketHandler {
 
     private static final List<WebSocketSession> list = new ArrayList<>();
+
+    private final Map<String, WebSocketSession> sessionMap = new ConcurrentHashMap<>();
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
@@ -31,6 +35,26 @@ public class LiveConnectionHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
 
+        var sessionId = session.getId();
+        sessionMap.put(sessionId, session);
+
+        Message message = Message.builder()
+                .sender(sessionId)
+                .receiver("all")
+                .build();
+        message.newConnect();
+
+//        sessionMap.values().forEach(s -> {
+//            try {
+//                if(!s.getId().equals(sessionId)) {
+//                    log.info("{} connect", message);
+//                }
+//            } catch (Exception e) {
+//            }
+//        });
+
+        log.info("현재 연결된 세션 수 {}", sessionMap.size());
+
         list.add(session);
 
         log.info(session + " 클라이언트 접속");
@@ -40,6 +64,18 @@ public class LiveConnectionHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+        var sessionId = session.getId();
+        sessionMap.remove(sessionId);
+
+        final Message message = new Message();
+        message.closeConnect();
+        message.setSender(sessionId);
+
+//        Message message = Message.builder()
+//                .sender(sessionId)
+//                .receiver("all")
+//                .build();
+//        message.closeConnect();
 
         log.info(session + " 클라이언트 접속 해제");
         list.remove(session);
