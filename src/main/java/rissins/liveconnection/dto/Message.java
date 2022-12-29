@@ -1,4 +1,4 @@
-package rissins.liveconnection.config.handler;
+package rissins.liveconnection.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

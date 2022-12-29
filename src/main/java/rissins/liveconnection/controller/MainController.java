@@ -9,14 +9,13 @@ import org.springframework.web.bind.annotation.*;
 import static rissins.liveconnection.config.WebSocketConfig.count;
 
 @Controller
-@RequiredArgsConstructor
 @Slf4j
 public class MainController {
 
-    @GetMapping("main")
+    @GetMapping("/")
     public String index(Model model) {
         model.addAttribute("count", count);
-        return "main";
+        return "index";
     }
 
     @PostMapping("room")

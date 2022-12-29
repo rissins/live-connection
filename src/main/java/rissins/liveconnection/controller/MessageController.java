@@ -19,6 +19,6 @@ public class MessageController {
     @MessageMapping("/chat/message")
     public void send() {
         count++;
-        sendingOperations.convertAndSend("/topic/main" , count);
+        sendingOperations.convertAndSend("/topic" , count);
     }
 }
